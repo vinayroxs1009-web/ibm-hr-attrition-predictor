@@ -9,28 +9,18 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
 
-# ── Page Config ───────────────────────────────────────────────
-st.set_page_config(
-    page_title="IBM HR Attrition Predictor",
-    page_icon="🏢",
-    layout="wide"
-)
+st.set_page_config(page_title="IBM HR Attrition Predictor", page_icon="🏢", layout="wide")
 
-# ── Full Dark Theme CSS ───────────────────────────────────────
 st.markdown("""
 <style>
     .stApp, .main, section.main, [data-testid="stAppViewContainer"] {
         background-color: #0F1117 !important;
         color: #EAEAEA !important;
     }
-    [data-testid="stSidebar"] {
-        background-color: #1A1D2E !important;
-    }
+    [data-testid="stSidebar"] { background-color: #1A1D2E !important; }
     [data-testid="stSidebar"] * { color: #EAEAEA !important; }
     h1,h2,h3,h4,h5,h6,p,label,span,div { color: #EAEAEA !important; }
-    .stSelectbox label, .stSlider label {
-        color: #AAAAAA !important; font-size: 13px !important;
-    }
+    .stSelectbox label, .stSlider label { color: #AAAAAA !important; font-size: 13px !important; }
     .stSelectbox > div > div {
         background-color: #1A1D2E !important;
         color: #EAEAEA !important;
@@ -58,10 +48,16 @@ st.markdown("""
     .metric-sub   { color: #888; font-size: 12px; margin: 6px 0 0 0; }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
+    [data-testid="stElementToolbar"] {
+        background-color: #FFFFFF !important;
+        border-radius: 8px !important;
+        border: 1px solid #ddd !important;
+    }
+    [data-testid="stElementToolbar"] button svg { fill: #000000 !important; }
+    [data-testid="stElementToolbar"] button { color: #000000 !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Matplotlib dark defaults ──────────────────────────────────
 BG   = '#0F1117'
 CARD = '#1A1D2E'
 TEXT = '#EAEAEA'
@@ -77,14 +73,12 @@ plt.rcParams.update({
     'font.family': 'DejaVu Sans', 'font.size': 11,
 })
 
-# ── Load model ────────────────────────────────────────────────
 @st.cache_resource
 def load_model():
     return joblib.load('xgb_model.pkl')
 
 model = load_model()
 
-# ── Header ────────────────────────────────────────────────────
 st.markdown("""
 <h1 style='color:#EAEAEA;font-size:32px;font-weight:800;margin-bottom:4px'>
 🏢 IBM HR Attrition Predictor</h1>
@@ -93,7 +87,6 @@ Identify at-risk employees before they leave — XGBoost + SHAP Explainability</
 """, unsafe_allow_html=True)
 st.divider()
 
-# ── Sidebar inputs ────────────────────────────────────────────
 st.sidebar.markdown("<h2 style='color:#EAEAEA;font-size:20px;font-weight:700'>👤 Employee Profile</h2>", unsafe_allow_html=True)
 
 age                  = st.sidebar.slider("Age", 18, 60, 32)
@@ -113,7 +106,6 @@ training_times       = st.sidebar.slider("Training Times Last Year", 0, 6, 2)
 performance_rating   = st.sidebar.selectbox("Performance Rating (3=Meets / 4=Exceeds)", [3,4])
 stock_option_level   = st.sidebar.selectbox("Stock Option Level (0-3)", [0,1,2,3])
 
-# ── Build input row ───────────────────────────────────────────
 marital_map  = {"Single": 2, "Married": 1, "Divorced": 0}
 overtime_map = {"Yes": 1, "No": 0}
 
@@ -139,7 +131,6 @@ input_data = pd.DataFrame([{
     'YearsWithCurrManager': min(years_at_company, 4)
 }])
 
-# ── Predict ───────────────────────────────────────────────────
 proba        = model.predict_proba(input_data)[0][1]
 risk_pct     = round(proba * 100, 1)
 replace_cost = int(monthly_income * 12 * 0.5)
@@ -157,7 +148,6 @@ else:
     advice     = "✅ Employee appears stable. Continue regular check-ins and recognition."
     bar_color  = '#4CAF50'
 
-# ── Metric cards ──────────────────────────────────────────────
 c1, c2, c3 = st.columns([1,1,2])
 with c1:
     st.markdown(f"""<div class='metric-card'>
@@ -177,7 +167,6 @@ with c3:
         <p style='color:#EAEAEA;font-size:15px;font-weight:500;margin:6px 0'>{advice}</p>
     </div>""", unsafe_allow_html=True)
 
-# ── Risk gauge bar ────────────────────────────────────────────
 st.markdown("<br>", unsafe_allow_html=True)
 fig_g, ax_g = plt.subplots(figsize=(10, 1.3), facecolor=BG)
 ax_g.set_facecolor(BG)
@@ -189,8 +178,7 @@ ax_g.axvline(65, color=RED,       linestyle='--', linewidth=1.2, alpha=0.7)
 ax_g.text(20, 0.35, 'LOW',    color='#4CAF50', fontsize=9, ha='center', fontweight='bold')
 ax_g.text(52, 0.35, 'MEDIUM', color='#FF9800', fontsize=9, ha='center', fontweight='bold')
 ax_g.text(82, 0.35, 'HIGH',   color=RED,       fontsize=9, ha='center', fontweight='bold')
-ax_g.text(risk_pct, -0.35, f'{risk_pct}%', color=bar_color,
-          fontsize=12, ha='center', fontweight='bold')
+ax_g.text(risk_pct, -0.35, f'{risk_pct}%', color=bar_color, fontsize=12, ha='center', fontweight='bold')
 ax_g.set_xlabel("Attrition Risk %", color=TEXT, fontsize=11)
 ax_g.spines[:].set_visible(False)
 plt.tight_layout()
@@ -199,7 +187,6 @@ plt.close()
 
 st.divider()
 
-# ── SHAP dark bar chart ───────────────────────────────────────
 st.markdown("""
 <h3 style='color:#EAEAEA;font-size:20px;font-weight:700'>🔍 Why Is This Employee At Risk?</h3>
 <p style='color:#888;font-size:14px'>Each bar shows how much a feature pushes risk
@@ -207,9 +194,8 @@ st.markdown("""
 <span style='color:#2196F3;font-weight:700'>DOWN ↓ (blue)</span></p>
 """, unsafe_allow_html=True)
 
-explainer = shap.TreeExplainer(model)
-shap_vals = explainer.shap_values(input_data)
-
+explainer   = shap.TreeExplainer(model)
+shap_vals   = explainer.shap_values(input_data)
 shap_series = pd.Series(shap_vals[0], index=input_data.columns)
 top_shap    = shap_series.reindex(shap_series.abs().sort_values(ascending=False).index).head(10)
 top_shap    = top_shap.sort_values()
@@ -217,8 +203,7 @@ bar_colors  = [RED if v > 0 else BLUE for v in top_shap.values]
 
 fig_s, ax_s = plt.subplots(figsize=(10, 6), facecolor=BG)
 ax_s.set_facecolor(CARD)
-bars = ax_s.barh(top_shap.index, top_shap.values,
-                 color=bar_colors, edgecolor=BG, height=0.6)
+bars = ax_s.barh(top_shap.index, top_shap.values, color=bar_colors, edgecolor=BG, height=0.6)
 for bar, val in zip(bars, top_shap.values):
     ax_s.text(
         val + (0.04 if val >= 0 else -0.04),
@@ -228,9 +213,8 @@ for bar, val in zip(bars, top_shap.values):
         color=TEXT, fontsize=10, fontweight='bold'
     )
 ax_s.axvline(0, color=TEXT, linewidth=0.8, alpha=0.4)
-ax_s.set_xlabel("SHAP Value  (impact on attrition risk)", color=TEXT, fontsize=11)
-ax_s.set_title("Top 10 Features Driving This Prediction",
-               color=TEXT, fontsize=13, fontweight='bold', pad=14)
+ax_s.set_xlabel("SHAP Value (impact on attrition risk)", color=TEXT, fontsize=11)
+ax_s.set_title("Top 10 Features Driving This Prediction", color=TEXT, fontsize=13, fontweight='bold', pad=14)
 ax_s.tick_params(colors=TEXT, labelsize=10)
 ax_s.spines['top'].set_visible(False)
 ax_s.spines['right'].set_visible(False)
@@ -243,22 +227,19 @@ plt.close()
 
 st.divider()
 
-# ── Team risk table ───────────────────────────────────────────
 st.markdown("""
 <h3 style='color:#EAEAEA;font-size:20px;font-weight:700'>📊 Simulated Team Risk Overview</h3>
 <p style='color:#888;font-size:14px'>10 employees with varied profiles — who needs attention?</p>
 """, unsafe_allow_html=True)
 
 sample = pd.DataFrame({
-    'Employee':        [f'EMP-{i:03d}' for i in range(1,11)],
-    'Age':             [24,38,42,29,55,31,47,26,33,50],
-    'Monthly Income':  ['$2,500','$8,000','$12,000','$3,200','$15,000',
-                        '$4,000','$11,000','$2,800','$6,000','$18,000'],
-    'OverTime':        ['Yes','No','No','Yes','No','Yes','No','Yes','No','No'],
-    'Job Satisfaction':['Low','High','High','Low','High','Low','High','Low','Medium','High'],
-    'Risk Level':      ['🔴 High','🟢 Low','🟢 Low','🟡 Medium','🟢 Low',
-                        '🔴 High','🟢 Low','🔴 High','🟢 Low','🟢 Low']
+    'Employee':         [f'EMP-{i:03d}' for i in range(1,11)],
+    'Age':              [24,38,42,29,55,31,47,26,33,50],
+    'Monthly Income':   ['$2,500','$8,000','$12,000','$3,200','$15,000',
+                         '$4,000','$11,000','$2,800','$6,000','$18,000'],
+    'OverTime':         ['Yes','No','No','Yes','No','Yes','No','Yes','No','No'],
+    'Job Satisfaction': ['Low','High','High','Low','High','Low','High','Low','Medium','High'],
+    'Risk Level':       ['🔴 High','🟢 Low','🟢 Low','🟡 Medium','🟢 Low',
+                         '🔴 High','🟢 Low','🔴 High','🟢 Low','🟢 Low']
 })
 st.dataframe(sample, use_container_width=True, hide_index=True)
-
-st.divider()
