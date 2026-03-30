@@ -27,6 +27,20 @@ st.markdown("""
         border: 1px solid #2A2D3E !important;
         border-radius: 8px !important;
     }
+    ul[data-testid="stSelectboxVirtualDropdown"] {
+        background-color: #1A1D2E !important;
+    }
+    ul[data-testid="stSelectboxVirtualDropdown"] li {
+        background-color: #1A1D2E !important;
+        color: #EAEAEA !important;
+    }
+    ul[data-testid="stSelectboxVirtualDropdown"] li:hover {
+        background-color: #2A2D3E !important;
+        color: #FFFFFF !important;
+    }
+    li[role="option"] span {
+        color: #EAEAEA !important;
+    }
     hr { border-color: #2A2D3E !important; }
     .stAlert {
         background-color: #1A1D2E !important;
