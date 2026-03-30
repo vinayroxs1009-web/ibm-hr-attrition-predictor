@@ -262,5 +262,5 @@ sample = pd.DataFrame({
 st.dataframe(sample, use_container_width=True, hide_index=True)
 
 st.divider()
-st.markdown("<p style='color:#333;font-size:12px;text-align:center'>Built with XGBoost + SHAP | IBM HR Attrition Dataset | Data Science Portfolio Project</p>",
+st.markdown("<p style='color:#333;font-size:12px;text-align:center'>Built with XGBoost + SHAP | IBM HR Attrition Dataset,
             unsafe_allow_html=True)
