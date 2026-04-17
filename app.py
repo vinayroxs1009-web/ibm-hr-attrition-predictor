@@ -145,15 +145,15 @@ input_data = pd.DataFrame([{
     'YearsWithCurrManager': min(years_at_company, 4)
 }])
 
-proba        = model.predict_proba(input_data)[0][1]
-risk_pct     = round(proba * 100, 1)
+proba        = round(float(model.predict_proba(input_data)[0][1]) * 100, 1)
+risk_pct     = proba
 replace_cost = int(monthly_income * 12 * 0.5)
 
-if proba >= 0.65:
+if proba >= 65:
     risk_label = "🔴 HIGH RISK";   risk_class = "risk-high"
     advice     = "⚠️ Immediate intervention needed. Schedule 1:1, review compensation and workload."
     bar_color  = RED
-elif proba >= 0.40:
+elif proba >= 40:
     risk_label = "🟡 MEDIUM RISK"; risk_class = "risk-med"
     advice     = "👀 Monitor closely. Consider mentorship, role enrichment, or a salary review."
     bar_color  = '#FF9800'
@@ -182,17 +182,20 @@ with c3:
     </div>""", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
-fig_g, ax_g = plt.subplots(figsize=(10, 1.3), facecolor=BG)
+fig_g, ax_g = plt.subplots(figsize=(10, 1.6), facecolor=BG)
 ax_g.set_facecolor(BG)
 ax_g.barh(0, 100, color=GRID, height=0.4)
 ax_g.barh(0, risk_pct, color=bar_color, height=0.4)
-ax_g.set_xlim(0, 100); ax_g.set_yticks([])
+ax_g.set_xlim(0, 100)
+ax_g.set_yticks([])
 ax_g.axvline(40, color='#FF9800', linestyle='--', linewidth=1.2, alpha=0.7)
 ax_g.axvline(65, color=RED,       linestyle='--', linewidth=1.2, alpha=0.7)
-ax_g.text(20, 0.35, 'LOW',    color='#4CAF50', fontsize=9, ha='center', fontweight='bold')
-ax_g.text(52, 0.35, 'MEDIUM', color='#FF9800', fontsize=9, ha='center', fontweight='bold')
-ax_g.text(82, 0.35, 'HIGH',   color=RED,       fontsize=9, ha='center', fontweight='bold')
-ax_g.text(risk_pct, -0.35, f'{risk_pct}%', color=bar_color, fontsize=12, ha='center', fontweight='bold')
+ax_g.text(20, -0.55, 'LOW',    color='#4CAF50', fontsize=9, ha='center', fontweight='bold')
+ax_g.text(52, -0.55, 'MEDIUM', color='#FF9800', fontsize=9, ha='center', fontweight='bold')
+ax_g.text(82, -0.55, 'HIGH',   color=RED,       fontsize=9, ha='center', fontweight='bold')
+ax_g.text(risk_pct, 0.55, f'{risk_pct}%', color='#FFFFFF', fontsize=13,
+          ha='center', fontweight='bold',
+          bbox=dict(boxstyle='round,pad=0.3', facecolor=bar_color, edgecolor='none'))
 ax_g.set_xlabel("Attrition Risk %", color=TEXT, fontsize=11)
 ax_g.spines[:].set_visible(False)
 plt.tight_layout()
